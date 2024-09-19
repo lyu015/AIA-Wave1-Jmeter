@@ -1,0 +1,7 @@
+SELECT file_id
+FROM bki_callinfo WITH (NOLOCK)
+ WHERE gijun_date BETWEEN '20240101' AND '20240131' 
+     AND file_tag='Y'
+      AND (second_trans_date IS NULL OR second_trans_date='')
+      AND (retention_del_date IS NULL OR retention_del_date='')
+      AND file_format NOT IN ('AVI', 'avi', 'TXT', 'txt');
