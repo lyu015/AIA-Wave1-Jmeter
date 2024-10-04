@@ -1,0 +1,134 @@
+##SSL 설정
+cd  /home/jovt_aia/app_data/apache/conf/extra/
+cp -arp httpd-ssl.conf httpd-ssl.conf_241002
+vi  /home/jovt_aia/app_data/apache/conf/extra/httpd-ssl.conf
+
+Listen 443
+
+SSLHonorCipherOrder on
+
+SSLSessionCacheTimeout  300
+
+<VirtualHost *:443>
+    DocumentRoot  /home/jovt_aia/web_data
+    ServerName aha.aiaazure.biz
+
+    SSLEngine on
+    SSLProtocol -All +TLSv1.2
+    SSLCipherSuite ECDHE-RSA-AES128-GCM-SHA256:ECDHE-RSA-AES256-GCM-SHA384:ECDHE-RSA-AES128-SHA:ECDHE-RSA-AES256-SHA:ECDHE-RSA-AES128-SHA256:ECDHE-RSA-AES256-SHA384
+
+    SSLCertificateFile "/home/jovt_aia/app_data/apache/conf/extra/sslkey_azure/cert.pem"
+    SSLCertificateKeyFile "/home/jovt_aia/app_data/apache/conf/extra/sslkey_azure/key.pem"
+    SSLCertificateChainFile "/home/jovt_aia/app_data/apache/conf/extra/sslkey_azure/DigiCertCA.pem"
+	SSLPassPhraseDialog  exec:/home/jovt_aia/app_data/apache/conf/extra/sslkey_azure/ssl_PW
+
+   <Directory " /home/jovt_aia/web_data">
+         Require all granted
+         LimitRequestBody 5000000
+         AllowOverride AuthConfig
+     <Limit OPTIONS PROFIND>
+         Order allow,deny
+         Allow from all
+     </Limit>
+     <LimitExcept GET POST>
+         Order deny,allow
+         Deny from all
+     </LimitExcept>
+   </Directory>
+
+SetEnvIf User-Agent ".*MSIE.*" nokeepalive ssl-unclean-shutdown
+
+    JkMount  /* xbas001
+    JkMount  /*.txt xbas001
+    JkMount  /resources/* xbas001
+
+
+    ErrorDocument 400 /pages/error.jsp
+    ErrorDocument 401 /pages/error.jsp
+    ErrorDocument 403 /pages/error.jsp
+    ErrorDocument 404 /pages/error.jsp
+    ErrorDocument 500 /pages/error.jsp
+</VirtualHost>
+
+<VirtualHost *:443>
+    DocumentRoot  /home/jovt_aia/web_data
+    ServerName aha.aia.biz
+
+    SSLEngine on
+    SSLProtocol -All +TLSv1.2
+    SSLCipherSuite ECDHE-RSA-AES128-GCM-SHA256:ECDHE-RSA-AES256-GCM-SHA384:ECDHE-RSA-AES128-SHA:ECDHE-RSA-AES256-SHA:ECDHE-RSA-AES128-SHA256:ECDHE-RSA-AES256-SHA384
+
+    SSLCertificateFile "/home/jovt_aia/app_data/apache/conf/extra/sslkey/cert.pem"
+    SSLCertificateKeyFile "/home/jovt_aia/app_data/apache/conf/extra/sslkey/key.pem"
+    SSLCertificateChainFile "/home/jovt_aia/app_data/apache/conf/extra/sslkey/DigiCertCA.pem"
+	SSLPassPhraseDialog  exec:/home/jovt_aia/app_data/apache/conf/extra/sslkey/ssl_PW
+
+   <Directory " /home/jovt_aia/web_data">
+         Require all granted
+         LimitRequestBody 5000000
+         AllowOverride AuthConfig
+     <Limit OPTIONS PROFIND>
+         Order allow,deny
+         Allow from all
+     </Limit>
+     <LimitExcept GET POST>
+         Order deny,allow
+         Deny from all
+     </LimitExcept>
+   </Directory>
+
+SetEnvIf User-Agent ".*MSIE.*" nokeepalive ssl-unclean-shutdown
+
+    JkMount  /* xbas001
+    JkMount  /*.txt xbas001
+    JkMount  /resources/* xbas001
+
+
+    ErrorDocument 400 /pages/error.jsp
+    ErrorDocument 401 /pages/error.jsp
+    ErrorDocument 403 /pages/error.jsp
+    ErrorDocument 404 /pages/error.jsp
+    ErrorDocument 500 /pages/error.jsp
+</VirtualHost>
+
+
+########## MIME ##########
+AddType text/plain .inx
+AddType text/plain .cx
+
+########## Directory deny ##########
+<Location /WEB-INF>
+    SetHandler WEB-INF
+    Require all denied
+</Location>
+<Location /META-INF>
+    SetHandler META-INF
+    Require all denied
+</Location>
+
+########## Tomcat Connectors ##########
+Include conf/extra/httpd-jk.conf
+
+########### Apache head ##########
+ServerTokens Prod
+ServerSignature Off
+
+########### TraceMethod ##########
+TraceEnable Off
+(저장 후 종료)
+
+## MPM 설정
+vi /home/jovt_aia/app_data/apache/conf/extra/httpd-mpm.conf
+
+<IfModule mpm_event_module>
+    ServerLimit             26
+    StartServers             3
+    MinSpareThreads         75
+    MaxSpareThreads        250
+    ThreadsPerChild         25
+    MaxRequestWorkers      650
+    MaxConnectionsPerChild   0
+    KeepAlive Off
+    Timeout 10
+</IfModule>
+(저장 후 종료)
